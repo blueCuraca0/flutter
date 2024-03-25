@@ -1,17 +1,33 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:project_3_mobile_app_layout/episode.dart';
+import 'package:popover/popover.dart';
+import 'package:project_3_mobile_app_layout/pages/EpisodePage.dart';
 
-import 'DataSource.dart';
+import 'package:project_3_mobile_app_layout/widgets/EpisodeTile.dart';
+import 'package:project_3_mobile_app_layout/pages/HomePage.dart';
+import 'package:project_3_mobile_app_layout/pages/LibraryPage.dart';
+import 'package:project_3_mobile_app_layout/pages/SearchPage.dart';
+import 'package:project_3_mobile_app_layout/widgets/Drawer.dart';
+import 'package:project_3_mobile_app_layout/widgets/ScrollablePodcastCovers.dart';
+import 'package:project_3_mobile_app_layout/windows/PopupAccountWindow.dart';
+import 'CColors.dart';
+import 'Episode.dart';
 
 /*
-1) Побудувати ієрархію віджетів. А саме: Container, Column, Row, Expanded
-2) Продемонструвати стилізацію віджетів. А саме: колір, розмір, тінь, бекграунд
-3) Побудувати коректне розміщення віджетів за допомогою crossAxisAlignment, mainAxisAlignment
-4) На основі зазначених вище завдань створити імітацію верстки моб. застосунку
-* */
++ Scaffold
++ Drawer
++ FloatingButton
++ BottomNavigationBar
++ Анімований BottomNavigationBar (але через pageController, a не tabController)
++ Анімований Hero віджет
+* * *
+- SliverAppBar (не підійшов тут)
+*/
 
 void main() {
   runApp(const MyApp());
@@ -20,183 +36,220 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  static const double appBarHeight = 60;
-  static const double navBarHeight = 90;
-
   @override
   Widget build(BuildContext context) {
-
-    final DataSource dataSource = DataSource();
-    final Color bgColor = dataSource.bgColor;
-    final Color accentColor = dataSource.accentColor;
-    final Map<String, String> podcasts = dataSource.podcasts;
-    final List<Episode> episodes = dataSource.episodes;
-
     SystemChrome.setSystemUIOverlayStyle(
-        SystemUiOverlayStyle(
-          statusBarColor: bgColor,
-          systemNavigationBarColor: accentColor,
+        const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          systemNavigationBarColor: CColors.bottomNavBar,
           statusBarIconBrightness: Brightness.dark,
           systemNavigationBarIconBrightness: Brightness.dark,
         )
     );
+    return const MyHomePage();
+  }
+}
 
-    return MaterialApp(
+class MyHomePage extends StatelessWidget {
+  const MyHomePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
       title: "Google Podcasts' Imitation",
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: SafeArea(
-          child: Stack(
-            children: [
-              // BOTTOM LAYER (Subscriptions and Episodes)
-              Column(
-                children: [
-                  const SizedBox(height: appBarHeight),
-                  Expanded(
-                    child: ListView(
-                      padding: EdgeInsets.zero,
-                      children: [
-                        // SUBSCRIPTIONS
-                        Container(
-                          color: bgColor,
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: Column(
-                            children: [
-                              // UPPER PANEL
-                              Container(
-                                // padding: const EdgeInsets.only(bottom: 10),
-                                padding: const EdgeInsets.all(20),
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Subscriptions", style: TextStyle(fontWeight: FontWeight.w500),),
-                                    Text("More", style: TextStyle(color: Colors.grey),)
-                                  ],
-                                ),
-                              ),
-          
-                              // PODCAST COVERS
-                              SizedBox(
-                                  height: 85,
-                                  child: ListView.separated(
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: podcasts.length + 2,
-                                      itemBuilder: (context, index) {
-                                        if (index == 0 || index == podcasts.length + 1) {
-                                          return const SizedBox(width: 10,);
-                                        }
-                                        return ClipRRect(
-                                            borderRadius: BorderRadius.circular(10),
-                                            child: Image.asset(podcasts.values.elementAt(index - 1))
-                                        );
-                                      },
-                                      separatorBuilder: (context, index) => const SizedBox(width: 10,)
-                                  )
-                              )
-                            ],
-                          ),
-                        ),
-                        // EPISODES
-                        ...episodes,
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: navBarHeight),
-                ],
-              ),
-          
-              // TOP LAYER (AppBar and NavBar)
-              Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // AppBar
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    height: appBarHeight,
-                    decoration: BoxDecoration(
-                      color: bgColor,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
-                          offset: const Offset(0, 0),
-                          blurRadius: 10,
-                        )
-                      ]
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.connected_tv),
-                          tooltip: 'Connect to TV',
-                          onPressed: () {},
-                        ),
-                        const Text('Google Podcasts', style: TextStyle(fontSize: 20)),
-                        IconButton(
-                          icon: const Icon(Icons.account_circle),
-                          tooltip: 'Account',
-                          onPressed: () {},
-                        ),
-                      ],
-                    ),
-                  ),
-                  // NavBar
-                  Container(
-                    alignment: Alignment.bottomCenter,
-                    height: navBarHeight,
-                    padding: const EdgeInsets.all(10),
-                    color: accentColor,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.home_filled),
-                                tooltip: 'Main Page',
-                                onPressed: () {},
-                              ),
-                              const Text('Main Page')
-                            ],
-                          ),
-                        ),
-          
-                        Expanded(
-                          child: Column(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.search),
-                                tooltip: 'Search',
-                                onPressed: () {},
-                              ),
-                              const Text('Search')
-                            ],
-                          ),
-                        ),
-          
-                        Expanded(
-                          child: Column(
-                            children: [
-                              IconButton(
-                                icon: const Icon(Icons.video_library_outlined),
-                                tooltip: 'Library',
-                                onPressed: () {},
-                              ),
-                              const Text('Library')
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ]
-              )
-            ],
-          ),
-        ),
-      ),
+      home: MainPage(),
     );
   }
 }
+
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> with SingleTickerProviderStateMixin {
+  static late final MyDrawer _drawer;
+  static late final List<Widget> _pages;
+  static late final List<Episode> _episodes;
+  static late final List<EpisodeTile> _episodeTiles;
+  static late final Map<String, String> _podcasts;
+
+  static const PopupAccountWindow _popupAccountWindow = PopupAccountWindow();
+  final controller = PageController(initialPage: 0);
+
+  bool _isPopupAccountMenuOpened = false;
+  static const double iconSize = 28;
+  int _currentIndex = 0;
+
+  void _navigateBottomBar(int index) {
+    setState(() {
+      _currentIndex = index;
+      controller.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut
+      );
+    });
+  }
+
+  Icon _getHomePageIcon() {
+    if (_currentIndex == 0) {
+      return const Icon(Icons.home_outlined, size: iconSize,);
+    } else {
+      return const Icon(Icons.home, size: iconSize,);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _drawer = const MyDrawer();
+    _podcasts = {
+      'Буде тобі наука': 'lib/podcast_covers/bude_tobi_nauka.jpg',
+      'Hacking your ADHD': 'lib/podcast_covers/hacking_your_adhd.jpg',
+      'So cultured': 'lib/podcast_covers/so_cultured.jpg',
+      'Android Story': 'lib/podcast_covers/android_story.jpg',
+      'TED Talks Daily': 'lib/podcast_covers/ted_talks_daily.jpg',
+      'Today, explained': 'lib/podcast_covers/today_explained.jpg',
+    };
+    _episodes = [
+      Episode(
+          imagePath: 'lib/podcast_covers/bude_tobi_nauka.jpg',
+          podcastName: 'Буде тобі наука',
+          topic: 'Чому відкриття виду Homo naledi перевернуло еволюцію людини з ніг на голову?',
+          description: 'У 2013 році два відчайдухи Стівен Такер та Рік Гантер вирішили залізти до печери з красивою назвою «Висхідна Зоря» у Південній Африці. Там вони знайшли й зафільмували багацько кісток. З часом виявилось, що вони належать новому виду роду Homo, що отримали назву Homo naledi. Звідки взялася ця назва та що нам відомо про Homo naledi?'
+      ),
+      Episode(
+        imagePath: 'lib/podcast_covers/hacking_your_adhd.jpg',
+        podcastName: 'Hacking your ADHD',
+        topic: 'At the Root of ADHD: Trauma vs Genetics',
+        description: "In today’s episode, we have a listener question dealing with the root cause of ADHD and whether or not ADHD comes from trauma or it's something we're born with.",
+        timeSincePosted: '2 hours ago',
+      ),
+      Episode(
+        imagePath: 'lib/podcast_covers/so_cultured.jpg',
+        podcastName: 'So cultured',
+        topic: 'A new upgrade for humans? + Your fav influencer is a catfish!',
+        description: 'Welcome to the debut episode of the So Cultured Podcast! ?️ in todays episode Taz will explore the mind-bending possibility of humans having their own software upgrades, through unlocking the new capabilities of gene editing!',
+        timeSincePosted: "18 days ago",
+      ),
+      Episode(
+        imagePath: 'lib/podcast_covers/android_story.jpg',
+        podcastName: 'Android Story',
+        topic: 'Розмова про SORA від OpenAI',
+        description: 'Вирізка з patreon.',
+        timeSincePosted: '8 minutes ago',
+      ),
+      Episode(
+        imagePath: 'lib/podcast_covers/ted_talks_daily.jpg',
+        podcastName: 'TED Talks Daily',
+        topic: '3 mysteries of the universe - and a new force that might explain them | Alex Keshavarski',
+        description: "We're still in the dark about what 95 percent of our universe is made of — and the standard model for understanding particle physics has hit a limit. What's the next step forward? Particle physicist Alex Keshavarzi digs into the first results of the Muon g-2 experiment at Fermilab in Chicago, which found compelling evidence of new particles or forces existing in our universe — a finding that could act as a window into the subatomic world and deepen our understanding of the fabric of reality.",
+        timeSincePosted: '1 year ago',
+      ),
+      Episode(
+        imagePath: 'lib/podcast_covers/today_explained.jpg',
+        podcastName: 'Today, explained',
+        topic: 'Bringing back the SAT',
+        description: 'Four years after a pandemic pause, some colleges and universities are again requiring applicants to submit standardized test scores. Inside Higher Ed’s Liam Knox and the University of Delaware’s Dominique Baker explain.This episode was produced by Avishay Artsy, edited by Matt Collette, fact-checked by Laura Bullard, engineered by Rob Byers, and guest-hosted by Jonquilyn Hill.',
+        timeSincePosted: '2 months ago',
+      ),
+    ];
+    _episodeTiles = List.generate(
+        _episodes.length,
+            (index) => EpisodeTile(_episodes[index])
+    );
+    _pages = [
+      HomePage(_podcasts, _episodeTiles),
+      SearchPage(_podcasts, _episodeTiles),
+      const LibraryPage()
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Google Podcast"),
+        centerTitle: true,
+        actions: [
+          IconButton(
+              onPressed: () {
+                setState(() {
+                  _isPopupAccountMenuOpened = !_isPopupAccountMenuOpened;
+                });
+              },
+              icon: const Icon(Icons.account_circle, size: iconSize,)
+          ),
+        ],
+        backgroundColor: CColors.background,
+        surfaceTintColor: CColors.background,
+        elevation: 10,
+        shadowColor: Colors.black.withOpacity(0.5),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => EpisodePage(_episodes[Random().nextInt(_episodes.length)]))
+          );
+        },
+        backgroundColor: CColors.bottomNavBar,
+        foregroundColor: CColors.item,
+        shape: const CircleBorder(),
+        child: const Icon(Icons.shuffle, size: iconSize + 6,),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: _navigateBottomBar,
+        items: [
+          BottomNavigationBarItem(icon: _getHomePageIcon(), label: "Home"),
+          const BottomNavigationBarItem(icon: Icon(Icons.search, size: iconSize,), label: "Search"),
+          const BottomNavigationBarItem(icon: Icon(Icons.video_library_outlined, size: iconSize,), label: "Library"),
+        ],
+        backgroundColor: CColors.bottomNavBar,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: CColors.item,
+      ),
+      drawer: _drawer,
+      backgroundColor: CColors.background,
+      body: Stack(
+          children: [
+            PageView(
+              controller: controller,
+              children: _pages,
+            ),
+            _isPopupAccountMenuOpened ? _popupAccountWindow : const SizedBox(),
+          ]
+      )
+    );
+  }
+}
+
+/*
+
+Stack(
+        children: [
+          _pages[_currentIndex],
+          _isPopupAccountMenuOpened ? _popupAccountWindow : const SizedBox(),
+        ]
+      )
+
+
+BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: _navigateBottomBar,
+        items: [
+          BottomNavigationBarItem(icon: _getHomePageIcon(), label: "Home"),
+          const BottomNavigationBarItem(icon: Icon(Icons.search, size: iconSize,), label: "Search"),
+          const BottomNavigationBarItem(icon: Icon(Icons.video_library_outlined, size: iconSize,), label: "Library"),
+        ],
+        backgroundColor: CColors.bottomNavBar,
+        selectedItemColor: Colors.black,
+        unselectedItemColor: CColors.item,
+      )
+
+*/
