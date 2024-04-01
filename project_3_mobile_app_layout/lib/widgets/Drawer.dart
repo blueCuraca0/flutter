@@ -7,7 +7,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import '../CColors.dart';
-import 'ListPoint.dart';
 
 class MyDrawer extends StatefulWidget {
   const MyDrawer({super.key});
@@ -120,6 +119,56 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
             )
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class ListPoint extends StatefulWidget {
+  final String _point;
+  final String _subpoint;
+
+  const ListPoint(this._point, this._subpoint, {super.key});
+
+  @override
+  State<ListPoint> createState() => _ListPointState();
+}
+
+class _ListPointState extends State<ListPoint> {
+  var _isOpened = false;
+
+  _ListPointState();
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _isOpened = !_isOpened;
+        });
+      },
+      child: Container(
+        alignment: Alignment.centerLeft,
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Column(
+            children: [
+              FractionallySizedBox(
+                widthFactor: 1,
+                child: Text(
+                  widget._point,
+                  style: const TextStyle(fontSize: 18),
+                ),
+              ),
+              FractionallySizedBox(
+                widthFactor: 1,
+                child: _isOpened ?
+                Text(widget._subpoint, style: const TextStyle(fontSize: 14),)
+                    : const SizedBox(),
+              )
+            ],
+          ),
         ),
       ),
     );

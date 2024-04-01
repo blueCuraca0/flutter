@@ -2,15 +2,10 @@
 
 An imitation of Google Podcast's main page.
 
-## Getting Started
+## Tasks & Results
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. This project already was mostly decomposed on Stateful and Stateless widgets
+2. State changes was implemented in ListPoint, PlayPanel, EpisodeTile and MainPage (_setCurrentPlayingEpisode(), FAB's onTap)
+3. "Lifting state up" principle was demonstrated using EpisodeTile and PlayPanel
+   - PlayPanel's field episode was moved up to the MainPage class (field name: currentPlayingEpisode)
+   - Method _setCurrentPlayingEpisode() was created and passed down to EpisodeTile (so it's button can change the state of the MainPage)
