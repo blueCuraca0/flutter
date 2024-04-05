@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
 import 'package:monumental_habits/pages/HomePage.dart';
 import 'package:monumental_habits/pages/IntroductionPage.dart';
-import 'package:monumental_habits/widgets/HabitList.dart';
+import 'package:monumental_habits/pages/NewHabit.dart';
+import 'Model.dart';
 
 
-void main() {
+void main () {
   runApp(MyApp());
 }
 
@@ -20,6 +24,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
+  // 0 - Introduction page, 1 - Homepage, 2 - New Habit
   int _currentPage = 0;
 
   void _setCurrentPage(int index) {
@@ -33,7 +38,8 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     widget._pages = [
       IntroductionPage(_setCurrentPage),
-      HomePage()
+      HomePage(_setCurrentPage),
+      NewHabit(_setCurrentPage)
     ];
   }
 
@@ -47,10 +53,15 @@ class _MyAppState extends State<MyApp> {
         systemNavigationBarIconBrightness: Brightness.dark
       )
     );
-    return MaterialApp(
-        title: 'Monumental Habits',
-        debugShowCheckedModeBanner: false,
-        home: widget._pages[_currentPage]
+    return ChangeNotifierProvider(
+      create: (context) => Model(),
+      builder: (context, child) {
+        return MaterialApp(
+            title: 'Monumental Habits',
+            debugShowCheckedModeBanner: false,
+            home: widget._pages[_currentPage]
+        );
+      },
     );
   }
 }

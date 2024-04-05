@@ -7,4 +7,7 @@ class CColors {
   static const Color pink = Color(0xffffe5f2);
   static const Color purple = Color(0xff573353);
   static const Color orange = Color(0xfffda758);
+
+
+  static const Color yellowWithOpacity = Color(0x55ffc785);
 }
