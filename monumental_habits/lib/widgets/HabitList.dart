@@ -34,6 +34,8 @@ class HabitList extends StatelessWidget {
 class HabitListHeader extends StatelessWidget {
   HabitListHeader({super.key});
 
+  late DateTime today;
+
   String getWeekdayName (DateTime today) {
     switch (today.weekday) {
       case 1:
@@ -57,46 +59,42 @@ class HabitListHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    today = Provider.of<Model>(context).currentDate;
     return Padding(
       padding: const EdgeInsets.only(left: 30, right: 30),
-      child: Consumer<Model>(
-        builder: (context, model, child) {
-          return Row(
-            children: [
-              Expanded(
-                flex: 4,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Text(
-                    "HABITS",
-                    style: TextStyle(
-                        color: model.textColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 15
-                    ),
-                  ),
-                ),
+      child: Row(
+        children: [
+          const Expanded(
+            flex: 4,
+            child: Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: Text(
+                "HABITS",
+                style: TextStyle(
+                    color: CColors.purple,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 15),
               ),
-              Expanded(
-                flex: 7,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    DateSquare(
-                        day: getWeekdayName(model.currentDate.subtract(const Duration(days: 2))),
-                        date: model.currentDate.day - 2
-                    ),
-                    DateSquare(
-                        day: getWeekdayName(model.currentDate.subtract(const Duration(days: 1))),
-                        date: model.currentDate.day - 1
-                    ),
-                    DateSquare(day: getWeekdayName(model.currentDate), date: model.currentDate.day),
-                  ],
+            ),
+          ),
+          Expanded(
+            flex: 7,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                DateSquare(
+                  day: getWeekdayName(today.subtract(const Duration(days: 2))),
+                  date: today.day - 2
                 ),
-              ),
-            ],
-          );
-        },
+                DateSquare(
+                  day: getWeekdayName(today.subtract(const Duration(days: 1))),
+                  date: today.day - 1
+                ),
+                DateSquare(day: getWeekdayName(today), date: today.day),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -116,47 +114,42 @@ class HabitTile extends StatelessWidget {
       HabitSquare(id: 1, habit: _habit, color: CColors.orange,),
       HabitSquare(id: 2, habit: _habit, color: CColors.orange,),
     ];
-
     return Padding(
       padding: const EdgeInsets.only(left: 30, right: 30, top: 15),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(15),
-        child: Consumer<Model>(
-          builder: (context, model, child) {
-            return Container(
-              color: model.primaryColor,
-              height: squareSize + 20,
-              width: double.infinity,
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 6,
-                    child: Container(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: Text(
-                        _habit.name,
-                        style: TextStyle(
-                          color: model.textColor,
-                          fontWeight: FontWeight.w500
-                        ),
-                      )
-                    )
-                  ),
-                  Container(
-                    width: 1,
-                    color: CColors.yellowWithOpacity,
-                  ),
-                  Expanded(
-                    flex: 10,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: habitSquares,
+        child: Container(
+          color: Colors.white,
+          height: squareSize + 20,
+          width: double.infinity,
+          child: Row(
+            children: [
+              Expanded(
+                flex: 6,
+                child: Container(
+                  padding: const EdgeInsets.only(left: 20),
+                  child: Text(
+                    _habit.name,
+                    style: const TextStyle(
+                      color: CColors.purple,
+                      fontWeight: FontWeight.w500
                     ),
-                  ),
-                ],
+                  )
+                )
               ),
-            );
-          },
+              Container(
+                width: 1,
+                color: CColors.yellowWithOpacity,
+              ),
+              Expanded(
+                flex: 10,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: habitSquares,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -238,10 +231,12 @@ class _HabitSquareState extends State<HabitSquare> {
 }
 
 class DateSquare extends StatelessWidget {
+  final Color color;
   final String day;
   final int date;
 
   DateSquare({
+    this.color = Colors.white,
     required this.day,
     required this.date,
     super.key
@@ -251,47 +246,43 @@ class DateSquare extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
-      child: Consumer<Model>(
-        builder: (context, model, child) {
-          return Container(
-            color: model.primaryColor.withOpacity(0.2),
-            height: squareSize,
-            width: squareSize,
+      child: Container(
+        color: color.withOpacity(0.2),
+        height: squareSize,
+        width: squareSize,
+        alignment: Alignment.center,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            color: color,
+            height: squareSize - 4,
+            width: squareSize - 4,
             alignment: Alignment.center,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Container(
-                color: model.primaryColor,
-                height: squareSize - 4,
-                width: squareSize - 4,
-                alignment: Alignment.center,
-                child: RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: day,
-                          style: TextStyle(
-                            color: model.textColor.withOpacity(0.5),
+            child: RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                  children: [
+                    TextSpan(
+                        text: day,
+                        style: TextStyle(
+                            color: CColors.purple.withOpacity(0.5),
                             fontWeight: FontWeight.w700,
                             fontSize: 10
-                          )
-                        ),
-                        TextSpan(
-                          text: "\n$date",
-                          style: TextStyle(
-                            color: model.textColor,
+                        )
+                    ),
+                    TextSpan(
+                        text: "\n$date",
+                        style: const TextStyle(
+                            color: CColors.purple,
                             fontWeight: FontWeight.w700,
                             fontSize: 15
-                          )
                         )
-                      ]
-                  ),
-                ),
+                    )
+                  ]
               ),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }

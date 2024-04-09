@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'package:monumental_habits/pages/MainScreen.dart';
-import 'package:monumental_habits/pages/IntroductionScreen.dart';
-import 'package:monumental_habits/pages/NewHabitScreen.dart';
+import 'package:monumental_habits/pages/HomePage.dart';
+import 'package:monumental_habits/pages/IntroductionPage.dart';
+import 'package:monumental_habits/pages/NewHabit.dart';
 import 'Model.dart';
 
 
@@ -24,13 +24,22 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
+  // 0 - Introduction page, 1 - Homepage, 2 - New Habit
+  int _currentPage = 0;
+
+  void _setCurrentPage(int index) {
+    setState(() {
+      _currentPage = index;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     widget._pages = [
-      IntroductionScreen(),
-      MainScreen(),
-      NewHabitScreen()
+      IntroductionPage(_setCurrentPage),
+      HomePage(_setCurrentPage),
+      NewHabit(_setCurrentPage)
     ];
   }
 
@@ -50,24 +59,9 @@ class _MyAppState extends State<MyApp> {
         return MaterialApp(
             title: 'Monumental Habits',
             debugShowCheckedModeBanner: false,
-            home: Pages(widget._pages)
+            home: widget._pages[_currentPage]
         );
       },
     );
   }
 }
-
-class Pages extends StatelessWidget {
-  final List<Widget> _pages;
-  const Pages(this._pages, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<Model>(
-      builder: (context, model, child) {
-        return _pages[model.currentPage];
-      },
-    );
-  }
-}
-

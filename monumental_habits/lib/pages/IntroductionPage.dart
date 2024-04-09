@@ -6,16 +6,16 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../Model.dart';
 import '../constants/CColors.dart';
 
-class IntroductionScreen extends StatefulWidget {
-  // final Function _setCurrentPage;
+class IntroductionPage extends StatefulWidget {
+  final Function _setCurrentPage;
 
-  const IntroductionScreen({super.key});
+  const IntroductionPage(this._setCurrentPage, {super.key});
 
   @override
-  State<IntroductionScreen> createState() => _IntroductionScreenState();
+  State<IntroductionPage> createState() => _IntroductionPageState();
 }
 
-class _IntroductionScreenState extends State<IntroductionScreen> {
+class _IntroductionPageState extends State<IntroductionPage> {
   final List<Widget> _pages = [
     Image.asset(
       "lib/images/Introduction 1.png",
@@ -49,8 +49,8 @@ class _IntroductionScreenState extends State<IntroductionScreen> {
 
   Widget _buildNavigationBar() {
     return _onLastPage
-        ? GetStartedButton()
-        : NavigationBarWithDots(_pages, _controller, _nextPage);
+        ? GetStartedButton(widget._setCurrentPage)
+        : NavigationBarWithDots(widget._setCurrentPage, _pages, _controller, _nextPage);
   }
 
   @override
@@ -83,15 +83,15 @@ class _IntroductionScreenState extends State<IntroductionScreen> {
 }
 
 class GetStartedButton extends StatelessWidget {
-  // final Function _setCurrentPage;
+  final Function _setCurrentPage;
 
-  const GetStartedButton({super.key});
+  const GetStartedButton(this._setCurrentPage, {super.key});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Provider.of<Model>(context, listen: false).setCurrentPage(1);
+        _setCurrentPage(1);
       },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
@@ -120,10 +120,10 @@ class NavigationBarWithDots extends StatelessWidget {
   final Function nextPage;
   final List<Widget> _pages;
   final PageController _controller;
-  // final Function _setCurrentPage;
+  final Function _setCurrentPage;
 
   const NavigationBarWithDots(
-      // this._setCurrentPage,
+      this._setCurrentPage,
       this._pages,
       this._controller,
       this.nextPage,
@@ -137,14 +137,12 @@ class NavigationBarWithDots extends StatelessWidget {
       children: [
         InkWell(
           onTap: () {
-            Provider.of<Model>(context, listen: false).setCurrentPage(1);
+            _setCurrentPage(1);
           },
           child: const Text(
             "skip",
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              color: CColors.purple
-            ),
+            style:
+                TextStyle(fontWeight: FontWeight.w500, color: CColors.purple),
           ),
         ),
         SmoothPageIndicator(

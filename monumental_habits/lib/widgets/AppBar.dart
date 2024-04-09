@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import '../Model.dart';
 import '../constants/CColors.dart';
 
 class MyAppBar extends StatelessWidget {
@@ -26,36 +24,31 @@ class MyAppBar extends StatelessWidget {
         left: 30,
         right: 30
       ),
-      child: Consumer<Model>(
-        builder: (context, model, child) {
-          return Row(
-            children: [
-              ClipOval(
-                child: Container(
-                  color: model.textColor.withOpacity(0.15),
-                  child: leading,
-                ),
-              ),
-              Expanded(
-                child: Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 20,
-                    color: model.textColor
-                  ),
-                ),
-              ),
-              ClipOval(
-                child: Container(
-                  color: model.textColor.withOpacity(0.15),
-                  child: action ?? const SizedBox(width: 45),
-                ),
-              )
-            ],
-          );
-        },
+      child: Row(
+        children: [
+          ClipOval(
+            child: Container(
+              color: CColors.purple.withOpacity(0.15),
+              child: leading,
+            ),
+          ),
+          Expanded(
+            child: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                  fontSize: 20,
+                  color: CColors.purple),
+            ),
+          ),
+          ClipOval(
+            child: Container(
+              color: CColors.purple.withOpacity(0.15),
+              child: action ?? const SizedBox(width: 45),
+            ),
+          )
+        ],
       ),
     );
   }

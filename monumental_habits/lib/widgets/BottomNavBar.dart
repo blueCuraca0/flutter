@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:monumental_habits/pages/SettingsPage.dart';
-import 'package:provider/provider.dart';
 
 import '../../constants/CColors.dart';
-import '../Model.dart';
 
 class BottomNavBar extends StatelessWidget {
 
   final Function _onFABTap;
-  final Icon _iconFAB;
+  final Icon _icon;
 
-  const BottomNavBar(this._onFABTap, this._iconFAB, {super.key});
+  const BottomNavBar(this._onFABTap, this._icon, {super.key});
 
   static const double _bottomNavBarHeightPanel = 80;
   static const double _floatingActionButtonHeight = 60;
@@ -20,91 +17,58 @@ class BottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
-
     return SizedBox(
         height: _bottomNavBarHeightPanel + _floatingActionButtonHeight * 2 / 3,
-        child: Consumer<Model>(
-          builder: (context, model, child) {
-            return Stack(
-              children: [
-                Container(
-                  alignment: Alignment.bottomCenter,
-                  child: CustomPaint(
-                    // TODO чому без цього поля не працює?
-                    key: ValueKey(model.isDarkTheme),
-                    size: const Size(double.infinity, _bottomNavBarHeightPanel),
-                    painter: BottomNavBarCustomPainter(
-                        width,
-                        _bottomNavBarHeightPanel,
-                        model.primaryColor
-                    ),
-                  ),
-                ),
-                Container(
-                    height: _bottomNavBarFullHeight,
-                    alignment: Alignment.topCenter,
-                    child: MyFloatingActionButton(
-                      _floatingActionButtonHeight,
-                      _onFABTap,
-                      _iconFAB,
-                    )
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SizedBox(
-                    height: _bottomNavBarHeightPanel,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        IconButton(
-                            onPressed: () {
-                              Provider.of<Model>(context, listen: false).setCurrentTab(0);
-                            },
-                            icon: Icon(Icons.home, color: model.secondaryColor.withOpacity(0.75))
-                        ),
-                        IconButton(
-                            onPressed: () {
-                              Provider.of<Model>(context, listen: false).setCurrentTab(1);
-                            },
-                            icon: Icon(Icons.article, color: model.secondaryColor.withOpacity(0.75))
-                        ),
-                        const SizedBox(width: 40),
-                        IconButton(
-                            onPressed: () {
-                              Provider.of<Model>(context, listen: false).setCurrentTab(2);
-                            },
-                            icon: Icon(Icons.group, color: model.secondaryColor.withOpacity(0.75))
-                        ),
-                        IconButton(
-                            onPressed: () {
-                              Provider.of<Model>(context, listen: false).setCurrentTab(3);
-                            },
-                            icon: Icon(Icons.settings, color: model.secondaryColor.withOpacity(0.75))
-                        ),
-                      ],
-                    ),
-                  ),
+        child: Stack(
+          children: [
+            Container(
+              alignment: Alignment.bottomCenter,
+              child: CustomPaint(
+                size: const Size(double.infinity, _bottomNavBarHeightPanel),
+                painter: BottomNavBarCustomPainter(width, _bottomNavBarHeightPanel),
+              ),
+            ),
+            Container(
+                height: _bottomNavBarFullHeight,
+                alignment: Alignment.topCenter,
+                child: MyFloatingActionButton(
+                  _floatingActionButtonHeight,
+                  _onFABTap,
+                  _icon,
                 )
-              ],
-            );
-          }
-        )
-    );
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: _bottomNavBarHeightPanel,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    IconButton(onPressed: () {}, icon: const Icon(Icons.home)),
+                    IconButton(onPressed: () {}, icon: const Icon(Icons.article)),
+                    const SizedBox(width: 40),
+                    IconButton(onPressed: () {}, icon: const Icon(Icons.group)),
+                    IconButton(onPressed: () {}, icon: const Icon(Icons.settings)),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ));
   }
 }
 
 class BottomNavBarCustomPainter extends CustomPainter {
   final double _width;
   final double _height;
-  final Color _color;
 
-  const BottomNavBarCustomPainter(this._width, this._height, this._color);
+  const BottomNavBarCustomPainter(this._width, this._height);
 
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint()
-      ..color = _color
+      ..color = Colors.white
       ..style = PaintingStyle.fill;
 
     Path path = Path()
