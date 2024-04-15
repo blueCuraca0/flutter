@@ -1,0 +1,6 @@
+{
+  "habits": [
+    { "name": "Code (loaded)", "wasDone": "[false, true, false]" },
+    { "name": "Read (loaded)", "wasDone": "[false, true, false]" }
+  ]
+}
