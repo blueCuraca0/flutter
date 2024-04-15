@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import '../Model.dart';
 import '../constants/CColors.dart';
 import '../constants/CStrings.dart';
-import '../widgets/BottomNavBar.dart';
 import '../widgets/HabitList.dart';
 
 class HomePage extends StatelessWidget {
@@ -26,7 +25,7 @@ class HomePage extends StatelessWidget {
             children: [
               SizedBox(height: size.height / 4,),
               Expanded(
-                child: Consumer<Model>(
+                child: Consumer<HabitNotifier>(
                   builder: (context, model, child) {
                     return HabitList(model.habitTiles, size);
                   },

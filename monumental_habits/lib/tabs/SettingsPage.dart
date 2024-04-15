@@ -34,32 +34,34 @@ class _SettingsPageState extends State<SettingsPage> {
                     alignment: Alignment.topLeft,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Consumer<Model>(builder: (context, model, child) {
-                        return Container(
-                          color: model.primaryColor,
-                          height: 60,
-                          width: double.infinity,
-                          alignment: Alignment.centerLeft,
-                          padding: const EdgeInsets.all(10),
-                          child: Row(
-                            children: [
-                              Text("Theme", style: TextStyle(
-                                color: model.textColor,
-                                fontSize: 18,
-                              )),
-                              const Expanded(child: SizedBox()),
-                              Switch(
-                                value: model.isDarkTheme,
-                                onChanged: (flag) {
-                                  setState(() {
-                                    model.setIsDarkTheme(flag);
-                                  });
-                                }
-                              )
-                            ],
-                          ),
-                        );
-                      }),
+                      child: Consumer<ThemeNotifier>(
+                        builder: (context, model, child) {
+                          return Container(
+                            color: model.primaryColor,
+                            height: 60,
+                            width: double.infinity,
+                            alignment: Alignment.centerLeft,
+                            padding: const EdgeInsets.all(10),
+                            child: Row(
+                              children: [
+                                Text("Theme", style: TextStyle(
+                                  color: model.textColor,
+                                  fontSize: 18,
+                                )),
+                                const Expanded(child: SizedBox()),
+                                Switch(
+                                  value: model.isDarkTheme,
+                                  onChanged: (flag) {
+                                    setState(() {
+                                      model.setIsDarkTheme(flag);
+                                    });
+                                  }
+                                )
+                              ],
+                            ),
+                          );
+                        }
+                      ),
                     ),
                   ),
                 ),

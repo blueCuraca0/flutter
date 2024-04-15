@@ -24,9 +24,51 @@ class HabitList extends StatelessWidget {
         children: [
           HabitListHeader(),
           ...habitTiles,
-          SizedBox(height: size.height / 5,)
+          const DeleteButton(),
+          SizedBox(
+            height: size.height / 5,
+          )
         ],
       ),
+    );
+  }
+}
+
+class DeleteButton extends StatelessWidget {
+  const DeleteButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<HabitNotifier>(
+      builder: (context, model, child) {
+        return model.habits.isEmpty
+            ? const SizedBox()
+            : Padding(
+                padding: const EdgeInsets.all(30),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Consumer<ThemeNotifier>(
+                    builder: (context, theme, child) {
+                      return Container(
+                        color: theme.primaryColor,
+                        width: 30,
+                        child: IconButton(
+                          onPressed: () {
+                            Future.delayed(const Duration(seconds: 1)).then((value) {
+                              model.deleteAllHabits();
+                            });
+                          },
+                          icon: Icon(
+                            Icons.delete_sweep_outlined,
+                            size: 30,
+                            color: theme.textColor,
+                          )),
+                      );
+                    },
+                  ),
+                ),
+              );
+      },
     );
   }
 }
@@ -34,7 +76,7 @@ class HabitList extends StatelessWidget {
 class HabitListHeader extends StatelessWidget {
   HabitListHeader({super.key});
 
-  String getWeekdayName (DateTime today) {
+  String getWeekdayName(DateTime today) {
     switch (today.weekday) {
       case 1:
         return 'MON';
@@ -59,44 +101,47 @@ class HabitListHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 30, right: 30),
-      child: Consumer<Model>(
-        builder: (context, model, child) {
-          return Row(
-            children: [
-              Expanded(
-                flex: 4,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20),
-                  child: Text(
-                    "HABITS",
-                    style: TextStyle(
-                        color: model.textColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 15
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 7,
-                child: Row(
+      child: Row(
+        children: [
+          Expanded(
+            flex: 4,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: Consumer<ThemeNotifier>(builder: (context, theme, child) {
+                return Text(
+                  "HABITS",
+                  style: TextStyle(
+                      color: theme.textColor,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15),
+                );
+              }),
+            ),
+          ),
+          Expanded(
+            flex: 7,
+            child: Consumer<DateNotifier>(
+              builder: (context, date, child) {
+                return Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     DateSquare(
-                        day: getWeekdayName(model.currentDate.subtract(const Duration(days: 2))),
-                        date: model.currentDate.day - 2
-                    ),
+                        day: getWeekdayName(
+                            date.currentDate.subtract(const Duration(days: 2))),
+                        date: date.currentDate.day - 2),
                     DateSquare(
-                        day: getWeekdayName(model.currentDate.subtract(const Duration(days: 1))),
-                        date: model.currentDate.day - 1
-                    ),
-                    DateSquare(day: getWeekdayName(model.currentDate), date: model.currentDate.day),
+                        day: getWeekdayName(
+                            date.currentDate.subtract(const Duration(days: 1))),
+                        date: date.currentDate.day - 1),
+                    DateSquare(
+                        day: getWeekdayName(date.currentDate),
+                        date: date.currentDate.day),
                   ],
-                ),
-              ),
-            ],
-          );
-        },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -104,24 +149,35 @@ class HabitListHeader extends StatelessWidget {
 
 class HabitTile extends StatelessWidget {
   final Habit _habit;
-  // int daysCounter = 0;
-  late List<HabitSquare> habitSquares;
+  late final List<HabitSquare> habitSquares;
 
-  HabitTile(this._habit, {super.key});
+  HabitTile(this._habit, {super.key}) {
+    habitSquares = [
+      HabitSquare(
+        id: 0,
+        habit: _habit,
+        color: CColors.orange,
+      ),
+      HabitSquare(
+        id: 1,
+        habit: _habit,
+        color: CColors.orange,
+      ),
+      HabitSquare(
+        id: 2,
+        habit: _habit,
+        color: CColors.orange,
+      ),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
-    habitSquares = [
-      HabitSquare(id: 0, habit: _habit, color: CColors.orange,),
-      HabitSquare(id: 1, habit: _habit, color: CColors.orange,),
-      HabitSquare(id: 2, habit: _habit, color: CColors.orange,),
-    ];
-
     return Padding(
       padding: const EdgeInsets.only(left: 30, right: 30, top: 15),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(15),
-        child: Consumer<Model>(
+        child: Consumer<ThemeNotifier>(
           builder: (context, model, child) {
             return Container(
               color: model.primaryColor,
@@ -130,18 +186,15 @@ class HabitTile extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                    flex: 6,
-                    child: Container(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: Text(
-                        _habit.name,
-                        style: TextStyle(
-                          color: model.textColor,
-                          fontWeight: FontWeight.w500
-                        ),
-                      )
-                    )
-                  ),
+                      flex: 6,
+                      child: Container(
+                          padding: const EdgeInsets.only(left: 20),
+                          child: Text(
+                            _habit.name,
+                            style: TextStyle(
+                                color: model.textColor,
+                                fontWeight: FontWeight.w500),
+                          ))),
                   Container(
                     width: 1,
                     color: CColors.yellowWithOpacity,
@@ -168,12 +221,11 @@ class HabitSquare extends StatefulWidget {
   final Color color;
   final Habit habit;
 
-  HabitSquare({
-    required this.id,
-    required this.habit,
-    this.color = Colors.white,
-    super.key
-  });
+  HabitSquare(
+      {required this.id,
+      required this.habit,
+      this.color = Colors.white,
+      super.key});
 
   @override
   State<HabitSquare> createState() => _HabitSquareState();
@@ -182,58 +234,51 @@ class HabitSquare extends StatefulWidget {
 class _HabitSquareState extends State<HabitSquare> {
   late final Color backgroundColor;
   late Color foregroundColor;
-  bool isNewWasDoneElementCreated = false;
 
   @override
   void initState() {
     super.initState();
-
-    if(!isNewWasDoneElementCreated) {
-      widget.habit.newDate();
-      setState(() {
-        isNewWasDoneElementCreated = true;
-      });
-    }
-
     backgroundColor = widget.color.withOpacity(0.2);
-    foregroundColor = (widget.habit.wasDone[widget.id]) ? widget.color : backgroundColor;
+    foregroundColor =
+        (widget.habit.wasDone[widget.id]) ? widget.color : backgroundColor;
   }
 
   @override
   Widget build(BuildContext context) {
-    return widget.habit.wasDone.isEmpty ? const SizedBox() : InkWell(
-      onTap: () {
-        setState(() {
-          foregroundColor = widget.color;
-          widget.habit.wasDone[widget.id] = true;
-          // print("> ${widget.id} IS ${widget.habit.wasDone[widget.id]}");
-        });
-      },
-      onDoubleTap: () {
-        setState(() {
-          foregroundColor = backgroundColor;
-        });
-      },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
-          color: backgroundColor,
-          height: squareSize,
-          width: squareSize,
-          alignment: Alignment.center,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-              color: foregroundColor,
-              height: squareSize - 4,
-              width: squareSize - 4,
-              alignment: Alignment.center,
+    return widget.habit.wasDone.isEmpty
+        ? const SizedBox()
+        : InkWell(
+            onTap: () {
+              setState(() {
+                foregroundColor = widget.color;
+                widget.habit.wasDone[widget.id] = true;
+              });
+            },
+            onDoubleTap: () {
+              setState(() {
+                foregroundColor = backgroundColor;
+                widget.habit.wasDone[widget.id] = false;
+              });
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                color: backgroundColor,
+                height: squareSize,
+                width: squareSize,
+                alignment: Alignment.center,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    color: foregroundColor,
+                    height: squareSize - 4,
+                    width: squareSize - 4,
+                    alignment: Alignment.center,
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-      ),
-    );
-
+          );
   }
 }
 
@@ -241,17 +286,13 @@ class DateSquare extends StatelessWidget {
   final String day;
   final int date;
 
-  DateSquare({
-    required this.day,
-    required this.date,
-    super.key
-  });
+  DateSquare({required this.day, required this.date, super.key});
 
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
-      child: Consumer<Model>(
+      child: Consumer<ThemeNotifier>(
         builder: (context, model, child) {
           return Container(
             color: model.primaryColor.withOpacity(0.2),
@@ -267,26 +308,20 @@ class DateSquare extends StatelessWidget {
                 alignment: Alignment.center,
                 child: RichText(
                   textAlign: TextAlign.center,
-                  text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: day,
-                          style: TextStyle(
+                  text: TextSpan(children: [
+                    TextSpan(
+                        text: day,
+                        style: TextStyle(
                             color: model.textColor.withOpacity(0.5),
                             fontWeight: FontWeight.w700,
-                            fontSize: 10
-                          )
-                        ),
-                        TextSpan(
-                          text: "\n$date",
-                          style: TextStyle(
+                            fontSize: 10)),
+                    TextSpan(
+                        text: "\n$date",
+                        style: TextStyle(
                             color: model.textColor,
                             fontWeight: FontWeight.w700,
-                            fontSize: 15
-                          )
-                        )
-                      ]
-                  ),
+                            fontSize: 15))
+                  ]),
                 ),
               ),
             ),

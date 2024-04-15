@@ -2,23 +2,16 @@ class Habit {
   late final String _name;
   late final List<bool> _wasDone;
 
-  Habit({
-    required String name,
-    required List<bool> wasDone
-  }) {
+  Habit({required String name}) {
     _name = name;
-    _wasDone = wasDone;
-  }
-
-  void newDate() {
-    _wasDone.add(false);
-  }
-
-  void changeWasDone() {
-    _wasDone.last = !_wasDone.last;
+    _wasDone = [false, false, false];
   }
 
   String get name => _name;
 
   List<bool> get wasDone => _wasDone;
+
+  void newDate() {
+    _wasDone.add(false);
+  }
 }

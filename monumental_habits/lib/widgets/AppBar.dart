@@ -26,7 +26,7 @@ class MyAppBar extends StatelessWidget {
         left: 30,
         right: 30
       ),
-      child: Consumer<Model>(
+      child: Consumer<ThemeNotifier>(
         builder: (context, model, child) {
           return Row(
             children: [

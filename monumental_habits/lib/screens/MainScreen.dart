@@ -3,16 +3,16 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:monumental_habits/pages/HomePage.dart';
 import 'package:provider/provider.dart';
 
 import '../Model.dart';
 import '../constants/CColors.dart';
 import '../constants/CStrings.dart';
 import '../widgets/BottomNavBar.dart';
-import 'CommunityPage.dart';
-import 'CoursesPage.dart';
-import 'SettingsPage.dart';
+import '../tabs/HomePage.dart';
+import '../tabs/CommunityPage.dart';
+import '../tabs/CoursesPage.dart';
+import '../tabs/SettingsPage.dart';
 
 class MainScreen extends StatefulWidget {
   late List<Widget> _tabs;
@@ -45,50 +45,59 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery
-        .of(context)
-        .size;
-
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Consumer<Model>(
-          builder: (context, model, child) {
-            return Stack(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: double.infinity,
-                  child: Image.asset(
-                    "lib/images/Homepage.png",
-                    opacity: AlwaysStoppedAnimation(model.isDarkTheme ? 0.5 : 1),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-
-                PageView(
-                  controller: model.pageController,
-                  onPageChanged: (tab) {
-                    model.setCurrentTab(tab);
-                  },
-                  children: widget._tabs,
-                ),
-
-                Column(
+      body: Stack(
+        children: [
+          SizedBox(
+            width: double.infinity,
+            height: double.infinity,
+            child: Consumer<ThemeNotifier>(
+              builder: (context, theme, child) {
+                return Stack(
                   children: [
-                    const Expanded(child: SizedBox()),
-                    BottomNavBar(
-                        () { model.setCurrentPage(2); },
-                        const Icon(
-                          Icons.add_rounded,
-                          size: 35,
-                          color: CColors.purple,
-                        )
+                    Image.asset(
+                      "lib/images/Homepage.png",
+                      fit: BoxFit.cover,
                     ),
-                  ],
-                )
-              ],
-            );
-          }
+                    Container(
+                      color: Colors.black.withOpacity(theme.isDarkTheme ? 0.5 : 0),
+                    )
+                  ]
+                );
+              },
+            ),
+          ),
+
+          Consumer<TabNotifier>(
+            builder: (context, tabModel, child) {
+              return PageView(
+                controller: tabModel.pageController,
+                onPageChanged: (tab) {
+                  tabModel.setCurrentTab(tab);
+                },
+                children: widget._tabs,
+              );
+            },
+          ),
+
+          Column(
+            children: [
+              const Expanded(child: SizedBox()),
+              Consumer<ScreenNotifier>(
+                builder: (context, screen, child) {
+                  return BottomNavBar(
+                    () { screen.setCurrentPage(2); },
+                    const Icon(
+                      Icons.add_rounded,
+                      size: 35,
+                      color: CColors.purple,
+                    )
+                  );
+                },
+              ),
+            ],
+          )
+        ],
       ),
     );
   }

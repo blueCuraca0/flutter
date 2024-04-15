@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:monumental_habits/pages/SettingsPage.dart';
 import 'package:provider/provider.dart';
 
 import '../../constants/CColors.dart';
@@ -23,20 +22,20 @@ class BottomNavBar extends StatelessWidget {
 
     return SizedBox(
         height: _bottomNavBarHeightPanel + _floatingActionButtonHeight * 2 / 3,
-        child: Consumer<Model>(
-          builder: (context, model, child) {
+        child: Consumer<ThemeNotifier>(
+          builder: (context, theme, child) {
             return Stack(
               children: [
                 Container(
                   alignment: Alignment.bottomCenter,
                   child: CustomPaint(
                     // TODO чому без цього поля не працює?
-                    key: ValueKey(model.isDarkTheme),
+                    key: ValueKey(theme.isDarkTheme),
                     size: const Size(double.infinity, _bottomNavBarHeightPanel),
                     painter: BottomNavBarCustomPainter(
                         width,
                         _bottomNavBarHeightPanel,
-                        model.primaryColor
+                        theme.primaryColor
                     ),
                   ),
                 ),
@@ -59,28 +58,28 @@ class BottomNavBar extends StatelessWidget {
                       children: [
                         IconButton(
                             onPressed: () {
-                              Provider.of<Model>(context, listen: false).setCurrentTab(0);
+                              Provider.of<TabNotifier>(context, listen: false).setCurrentTab(0);
                             },
-                            icon: Icon(Icons.home, color: model.secondaryColor.withOpacity(0.75))
+                            icon: Icon(Icons.home, color: theme.secondaryColor.withOpacity(0.75))
                         ),
                         IconButton(
                             onPressed: () {
-                              Provider.of<Model>(context, listen: false).setCurrentTab(1);
+                              Provider.of<TabNotifier>(context, listen: false).setCurrentTab(1);
                             },
-                            icon: Icon(Icons.article, color: model.secondaryColor.withOpacity(0.75))
+                            icon: Icon(Icons.article, color: theme.secondaryColor.withOpacity(0.75))
                         ),
                         const SizedBox(width: 40),
                         IconButton(
                             onPressed: () {
-                              Provider.of<Model>(context, listen: false).setCurrentTab(2);
+                              Provider.of<TabNotifier>(context, listen: false).setCurrentTab(2);
                             },
-                            icon: Icon(Icons.group, color: model.secondaryColor.withOpacity(0.75))
+                            icon: Icon(Icons.group, color: theme.secondaryColor.withOpacity(0.75))
                         ),
                         IconButton(
                             onPressed: () {
-                              Provider.of<Model>(context, listen: false).setCurrentTab(3);
+                              Provider.of<TabNotifier>(context, listen: false).setCurrentTab(3);
                             },
-                            icon: Icon(Icons.settings, color: model.secondaryColor.withOpacity(0.75))
+                            icon: Icon(Icons.settings, color: theme.secondaryColor.withOpacity(0.75))
                         ),
                       ],
                     ),
