@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:monumental_habits/screens/SplashScreen.dart';
+import 'package:monumental_habits/screens/splash_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import '../Model.dart';
-import '../constants/CColors.dart';
+import '../models.dart';
+import '../constants/c_colors.dart';
 
 class IntroductionScreen extends StatefulWidget {
   // final Function _setCurrentPage;
@@ -91,7 +91,7 @@ class GetStartedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Provider.of<ScreenNotifier>(context, listen: false).setCurrentPage(1);
+        Navigator.pushNamed(context, '/main');
       },
       child: ClipRRect(
         borderRadius: BorderRadius.circular(10),
@@ -137,7 +137,7 @@ class NavigationBarWithDots extends StatelessWidget {
       children: [
         InkWell(
           onTap: () {
-            Provider.of<ScreenNotifier>(context, listen: false).setCurrentPage(1);
+            Navigator.pushNamed(context, '/main');
           },
           child: const Text(
             "skip",

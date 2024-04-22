@@ -1,40 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:monumental_habits/UserSharedPreferences.dart';
+import 'package:monumental_habits/constants/c_routes.dart';
+import 'package:monumental_habits/user_shared_preferences.dart';
 import 'package:provider/provider.dart';
 
-import 'package:monumental_habits/screens/MainScreen.dart';
-import 'package:monumental_habits/screens/IntroductionScreen.dart';
-import 'package:monumental_habits/screens/NewHabitScreen.dart';
-import 'Model.dart';
+import 'package:monumental_habits/screens/main_screen.dart';
+import 'package:monumental_habits/screens/introduction_screen.dart';
+import 'package:monumental_habits/screens/new_habit_screen.dart';
+import 'models.dart';
 
 
 void main () async {
   WidgetsFlutterBinding.ensureInitialized();
   await UserSharedPreferences.init();
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  MyApp({super.key});
-
-  late final List<Widget> _screens;
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
+  late String initialRoute;
 
   @override
   void initState() {
     super.initState();
-    widget._screens = [
-      const IntroductionScreen(),
-      MainScreen(),
-      NewHabitScreen()
-    ];
+    initialRoute = UserSharedPreferences.getFirstTime()
+        ? CRoutes.routeIntroductionPage
+        : CRoutes.routeMainPage;
+    UserSharedPreferences.setFirstTime(false);
+
+
+    // TODO: не знаю куди роботу з темою діти, якщо ми використовуємо іменовані роути
+
+    /*
+    * Error: Could not find the correct Provider<ThemeNotifier> above this
+    * MyApp Widget. This happens because you used a `BuildContext` that does not include the provider
+    * of your choice.
+    */
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ThemeNotifier>(context, listen: false)
+          .setIsDarkTheme(UserSharedPreferences.getTheme());
+    });
   }
 
   @override
@@ -51,38 +64,20 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(create: (context) => HabitNotifier(),),
         ChangeNotifierProvider(create: (context) => DateNotifier(),),
-        ChangeNotifierProvider(create: (context) => ScreenNotifier(),),
-        ChangeNotifierProvider(create: (context) => TabNotifier(),),
         ChangeNotifierProvider(create: (context) => ThemeNotifier(),),
       ],
       builder: (context, child) {
-        Provider.of<ThemeNotifier>(context, listen: false)
-            .setIsDarkTheme(UserSharedPreferences.getTheme());
-        // якщо це перший раз в нашому застосунку, то юзера направить на ознайомчий екран
-        Provider.of<ScreenNotifier>(context, listen: false)
-            .setCurrentPage(UserSharedPreferences.getFirstTime() ? 0 : 1);
-        UserSharedPreferences.setFirstTime(false);
         return MaterialApp(
-            title: 'Monumental Habits',
-            debugShowCheckedModeBanner: false,
-            home: Screens(widget._screens)
+          title: 'Monumental Habits',
+          debugShowCheckedModeBanner: false,
+          initialRoute: initialRoute,
+          routes: {
+            CRoutes.routeIntroductionPage: (context) => const IntroductionScreen(),
+            CRoutes.routeMainPage: (context) => MainScreen(),
+            CRoutes.routeNewHabit: (context) => NewHabitScreen()
+          },
         );
       },
     );
   }
 }
-
-class Screens extends StatelessWidget {
-  final List<Widget> _screens;
-  const Screens(this._screens, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<ScreenNotifier>(
-      builder: (context, model, child) {
-        return _screens[model.currentPage];
-      },
-    );
-  }
-}
-

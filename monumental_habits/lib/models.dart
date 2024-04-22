@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:monumental_habits/UserSharedPreferences.dart';
-import 'package:monumental_habits/widgets/HabitList.dart';
-import 'constants/CColors.dart';
-import 'entities/Habit.dart';
+import 'package:monumental_habits/user_shared_preferences.dart';
+import 'package:monumental_habits/widgets/habit_list.dart';
+import 'constants/c_colors.dart';
+import 'entities/habit.dart';
 
 // HABITS
 class HabitNotifier extends ChangeNotifier {
@@ -50,39 +50,16 @@ class DateNotifier extends ChangeNotifier {
   }
 }
 
-// SCREENS
-class ScreenNotifier extends ChangeNotifier {
-
-  // 0 - Introduction, 1 - MainScreen, 2 - New Habit
-  int _currentPage = 0;
-  int get currentPage => _currentPage;
-
-  void setCurrentPage (index) {
-    _currentPage = index;
-    notifyListeners();
-  }
-}
-
 // TABS (4 pages in the PageView)
-class TabNotifier extends ChangeNotifier {
-  // 0 - Home, 1 - Courses, 2 - Community, 3 - Settings
-  int _currentTab = 0;
-  int get currentTab => _currentTab;
-  PageController _pageController = PageController();
-  PageController get pageController => _pageController;
-
-  void setCurrentTab (index) {
-    _currentTab = index;
-    // TODO чому анімація така дивна?
-    _pageController.animateToPage(
-        index,
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeIn
-    );
-    _pageController.jumpToPage(index);
-    notifyListeners();
-  }
-}
+// class TabNotifier extends ChangeNotifier {
+//   // 0 - Home, 1 - Courses, 2 - Community, 3 - Settings
+//   // int _currentTab = 0;
+//   // int get currentTab => _currentTab;
+//   // set currentTab (int tab) => _currentTab = tab;
+//
+//   final PageController _pageController = PageController();
+//   PageController get pageController => _pageController;
+// }
 
 // LIGHT & DARK THEM
 class ThemeNotifier extends ChangeNotifier {

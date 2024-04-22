@@ -1,18 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:monumental_habits/Model.dart';
+import 'package:monumental_habits/models.dart';
 import 'package:provider/provider.dart';
 
-import '../entities/Course.dart';
-import '../widgets/AppBar.dart';
+import '../course_service.dart';
+import '../entities/course.dart';
+import '../widgets/app_bar.dart';
 
 class CoursesPage extends StatelessWidget {
+  static CourseService courseService = const CourseService();
+
   const CoursesPage({super.key});
 
   FutureBuilder<Course> getCourseTile(int id) {
     return FutureBuilder<Course>(
-      future: Course.fetchCourse(id),
+      future: courseService.fetchCourse(id),
       builder: (context, snapshot) {
         if (snapshot.hasData && snapshot.data != null) {
           return CourseTile(snapshot.data!);

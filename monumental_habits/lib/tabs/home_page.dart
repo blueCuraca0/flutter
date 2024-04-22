@@ -1,17 +1,17 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:monumental_habits/widgets/AppBar.dart';
+import 'package:monumental_habits/widgets/app_bar.dart';
 import 'package:provider/provider.dart';
 
-import '../Model.dart';
-import '../constants/CColors.dart';
-import '../constants/CStrings.dart';
-import '../widgets/HabitList.dart';
+import '../models.dart';
+import '../constants/c_colors.dart';
+import '../constants/c_strings.dart';
+import '../widgets/habit_list.dart';
 
 class HomePage extends StatelessWidget {
 
-  HomePage({super.key});
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {

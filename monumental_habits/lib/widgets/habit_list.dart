@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-import '../Model.dart';
-import '../constants/CColors.dart';
-import '../entities/Habit.dart';
+import '../models.dart';
+import '../constants/c_colors.dart';
+import '../entities/habit.dart';
+import '../screens/habit_info_screen.dart';
 
 const double squareSize = 50;
 
@@ -156,17 +157,14 @@ class HabitTile extends StatelessWidget {
       HabitSquare(
         id: 0,
         habit: _habit,
-        color: CColors.orange,
       ),
       HabitSquare(
         id: 1,
         habit: _habit,
-        color: CColors.orange,
       ),
       HabitSquare(
         id: 2,
         habit: _habit,
-        color: CColors.orange,
       ),
     ];
   }
@@ -175,41 +173,56 @@ class HabitTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 30, right: 30, top: 15),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
-        child: Consumer<ThemeNotifier>(
-          builder: (context, model, child) {
-            return Container(
-              color: model.primaryColor,
-              height: squareSize + 20,
-              width: double.infinity,
-              child: Row(
-                children: [
-                  Expanded(
-                      flex: 6,
-                      child: Container(
+      child: InkWell(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        onLongPress: () {
+          Navigator.push(context,
+            MaterialPageRoute(builder: (context) {
+              return HabitInfoScreen(_habit);
+            })
+          );
+        },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15),
+          child: Consumer<ThemeNotifier>(
+            builder: (context, model, child) {
+              return Container(
+                color: model.primaryColor,
+                height: squareSize + 20,
+                width: double.infinity,
+                child: InkWell(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 6,
+                        child: Container(
                           padding: const EdgeInsets.only(left: 20),
                           child: Text(
                             _habit.name,
                             style: TextStyle(
-                                color: model.textColor,
-                                fontWeight: FontWeight.w500),
-                          ))),
-                  Container(
-                    width: 1,
-                    color: CColors.yellowWithOpacity,
+                              color: model.textColor,
+                              fontWeight: FontWeight.w500),
+                            )
+                        )
+                      ),
+                      Container(
+                        width: 1,
+                        color: CColors.yellowWithOpacity,
+                      ),
+                      Expanded(
+                        flex: 10,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: habitSquares,
+                        ),
+                      ),
+                    ],
                   ),
-                  Expanded(
-                    flex: 10,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: habitSquares,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -217,14 +230,12 @@ class HabitTile extends StatelessWidget {
 }
 
 class HabitSquare extends StatefulWidget {
-  late final int id;
-  final Color color;
+  final int id;
   final Habit habit;
 
-  HabitSquare(
+  const HabitSquare(
       {required this.id,
       required this.habit,
-      this.color = Colors.white,
       super.key});
 
   @override
@@ -238,9 +249,9 @@ class _HabitSquareState extends State<HabitSquare> {
   @override
   void initState() {
     super.initState();
-    backgroundColor = widget.color.withOpacity(0.2);
+    backgroundColor = widget.habit.color.withOpacity(0.2);
     foregroundColor =
-        (widget.habit.wasDone[widget.id]) ? widget.color : backgroundColor;
+        (widget.habit.wasDone[widget.id]) ? widget.habit.color : backgroundColor;
   }
 
   @override
@@ -250,7 +261,7 @@ class _HabitSquareState extends State<HabitSquare> {
         : InkWell(
             onTap: () {
               setState(() {
-                foregroundColor = widget.color;
+                foregroundColor = widget.habit.color;
                 widget.habit.wasDone[widget.id] = true;
               });
             },

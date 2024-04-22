@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 
-import '../Model.dart';
-import '../constants/CColors.dart';
-import '../widgets/AppBar.dart';
-import '../widgets/BottomNavBar.dart';
+import '../models.dart';
+import '../constants/c_colors.dart';
+import '../widgets/app_bar.dart';
+import '../widgets/bottom_nav_bar.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -17,8 +17,6 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery.of(context).size;
-
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Stack(

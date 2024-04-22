@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../Model.dart';
-import '../constants/CColors.dart';
+import '../models.dart';
+import '../constants/c_colors.dart';
 
 class MyAppBar extends StatelessWidget {
   final IconButton leading;

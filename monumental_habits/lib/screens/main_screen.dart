@@ -5,47 +5,56 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-import '../Model.dart';
-import '../constants/CColors.dart';
-import '../constants/CStrings.dart';
-import '../widgets/BottomNavBar.dart';
-import '../tabs/HomePage.dart';
-import '../tabs/CommunityPage.dart';
-import '../tabs/CoursesPage.dart';
-import '../tabs/SettingsPage.dart';
+import '../constants/c_routes.dart';
+import '../entities/habit.dart';
+import '../models.dart';
+import '../constants/c_colors.dart';
+import '../constants/c_strings.dart';
+import '../widgets/bottom_nav_bar.dart';
+import '../tabs/home_page.dart';
+import '../tabs/community_page.dart';
+import '../tabs/courses_page.dart';
+import '../tabs/settings_page.dart';
 
-class MainScreen extends StatefulWidget {
-  late List<Widget> _tabs;
+class MainScreen extends StatelessWidget {
+  final _navigatorKey = GlobalKey<NavigatorState>();
+  int currentPageIndex = 0;
+  List<String> routes = [
+    CRoutes.routeHomePage,
+    CRoutes.routeCourses,
+    CRoutes.routeCommunity,
+    CRoutes.routeSettings,
+  ];
 
   MainScreen({super.key});
 
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
+  Route _onGenerateRoute (RouteSettings settings) {
+    late Widget page;
 
-class _MainScreenState extends State<MainScreen> {
-  final controller = PageController(initialPage: 0);
+    switch (settings.name) {
+      case CRoutes.routeHomePage:
+        page = const HomePage();
+      case CRoutes.routeCourses:
+        page = const CoursesPage();
+      case CRoutes.routeCommunity:
+        page = const CommunityPage();
+      case CRoutes.routeSettings:
+        page = const SettingsPage();
+      default:
+        print(" U N K N O W N   R O U T E");
+        page = const Placeholder();
+    }
 
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    widget._tabs = [
-      HomePage(),
-      CoursesPage(),
-      CommunityPage(),
-      SettingsPage()
-    ];
+    return MaterialPageRoute<dynamic>(
+      builder: (context) => page,
+      settings: settings,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           SizedBox(
@@ -54,47 +63,48 @@ class _MainScreenState extends State<MainScreen> {
             child: Consumer<ThemeNotifier>(
               builder: (context, theme, child) {
                 return Stack(
-                  children: [
-                    Image.asset(
-                      "lib/images/Homepage.png",
-                      fit: BoxFit.cover,
-                    ),
-                    Container(
-                      color: Colors.black.withOpacity(theme.isDarkTheme ? 0.5 : 0),
-                    )
-                  ]
+                    children: [
+                      Image.asset(
+                        "lib/images/Homepage.png",
+                        fit: BoxFit.cover,
+                      ),
+                      Container(
+                        color: Colors.black.withOpacity(theme.isDarkTheme ? 0.5 : 0),
+                      )
+                    ]
                 );
               },
             ),
           ),
 
-          Consumer<TabNotifier>(
-            builder: (context, tabModel, child) {
-              return PageView(
-                controller: tabModel.pageController,
-                onPageChanged: (tab) {
-                  tabModel.setCurrentTab(tab);
-                },
-                children: widget._tabs,
-              );
-            },
+          GestureDetector(
+            // onHorizontalDragEnd: (DragEndDetails dragEndDetails) {
+            //   print(" s w i p e   right");
+            // },
+            // onHorizontalDragStart: (DragStartDetails dragStartDetails) {
+            //   print(" s w i p e   left");
+            // },
+            child: Navigator(
+              key: _navigatorKey,
+              initialRoute: CRoutes.routeHomePage,
+              onGenerateRoute: _onGenerateRoute,
+            ),
           ),
 
           Column(
             children: [
               const Expanded(child: SizedBox()),
-              Consumer<ScreenNotifier>(
-                builder: (context, screen, child) {
-                  return BottomNavBar(
-                    () { screen.setCurrentPage(2); },
-                    const Icon(
-                      Icons.add_rounded,
-                      size: 35,
-                      color: CColors.purple,
-                    )
-                  );
+              BottomNavBar(
+                _navigatorKey,
+                () {
+                  Navigator.pushNamed(context, CRoutes.routeNewHabit);
                 },
-              ),
+                const Icon(
+                  Icons.add_rounded,
+                  size: 35,
+                  color: CColors.purple,
+                )
+              )
             ],
           )
         ],
