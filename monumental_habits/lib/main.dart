@@ -1,6 +1,8 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:monumental_habits/constants/c_routes.dart';
+import 'package:monumental_habits/firebase_options.dart';
 import 'package:monumental_habits/user_shared_preferences.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +15,7 @@ import 'models.dart';
 void main () async {
   WidgetsFlutterBinding.ensureInitialized();
   await UserSharedPreferences.init();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform) ;
 
   runApp(const MyApp());
 }
@@ -44,10 +47,10 @@ class _MyAppState extends State<MyApp> {
     * of your choice.
     */
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ThemeNotifier>(context, listen: false)
-          .setIsDarkTheme(UserSharedPreferences.getTheme());
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   Provider.of<ThemeNotifier>(context, listen: false)
+    //       .setIsDarkTheme(UserSharedPreferences.getTheme());
+    // });
   }
 
   @override
@@ -62,7 +65,6 @@ class _MyAppState extends State<MyApp> {
     );
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => HabitNotifier(),),
         ChangeNotifierProvider(create: (context) => DateNotifier(),),
         ChangeNotifierProvider(create: (context) => ThemeNotifier(),),
       ],

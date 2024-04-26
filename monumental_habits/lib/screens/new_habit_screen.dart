@@ -1,12 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:monumental_habits/widgets/app_bar.dart';
 import 'package:provider/provider.dart';
 
 import '../models.dart';
 import '../constants/c_colors.dart';
 import '../entities/habit.dart';
+import '../services/firestore_service.dart';
 import '../widgets/bottom_nav_bar.dart';
 
 class NewHabitScreen extends StatefulWidget {
@@ -39,16 +38,19 @@ class _NewHabitScreenState extends State<NewHabitScreen> {
               height: double.infinity,
               child: Consumer<ThemeNotifier>(
                 builder: (context, theme, child) {
-                  return Stack(children: [
-                    Image.asset(
-                      "lib/images/Homepage.png",
-                      fit: BoxFit.cover,
-                    ),
-                    Container(
-                      color:
-                          Colors.black.withOpacity(theme.isDarkTheme ? 0.5 : 0),
-                    )
-                  ]);
+                  return Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.asset(
+                        "lib/images/Homepage.png",
+                        fit: BoxFit.cover,
+                      ),
+                      Container(
+                        color:
+                            Colors.black.withOpacity(theme.isDarkTheme ? 0.5 : 0),
+                      )
+                    ]
+                  );
                 },
               ),
             ),
@@ -156,13 +158,10 @@ class _NewHabitScreenState extends State<NewHabitScreen> {
                 BottomNavBar(
                   widget._navigatorKey,
                   () {
-                    Provider.of<HabitNotifier>(context, listen: false)
-                        .addHabitAndTile(
-                      Habit(name: _textController.text, color: chosenColor),
-                    );
+                    Habit habit = Habit(name: _textController.text, color: chosenColor);
+                    // Provider.of<HabitNotifier>(context, listen: false).addHabitAndTile(habit);
+                    FirestoreService.addHabit(habit);
                     Navigator.pop(context);
-                    // Navigator.pushNamed(context, '/main');
-                    // widget._navigatorKey.currentState!.pop();
                     _textController.text = "";
                   },
                   const Icon(

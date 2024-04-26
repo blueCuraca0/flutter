@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "927366578228",
+    "project_id": "monumental-habits-31e09",
+    "storage_bucket": "monumental-habits-31e09.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:927366578228:android:45668785b2f948d30e4a61",
+        "android_client_info": {
+          "package_name": "com.example.monumental_habits"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDe6ccIlXMw5qL61dP5AiB_CmTX_lglwfc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,65 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:monumental_habits/services/converter.dart';
+import 'package:monumental_habits/services/firestore_service.dart';
 import 'package:monumental_habits/user_shared_preferences.dart';
-import 'package:monumental_habits/widgets/habit_list.dart';
 import 'constants/c_colors.dart';
-import 'entities/habit.dart';
-
-// HABITS
-class HabitNotifier extends ChangeNotifier {
-  final List<Habit> _habits = [];
-  List<Habit> get habits => _habits;
-
-  final List<HabitTile> _habitTiles = [];
-  List<HabitTile> get habitTiles => _habitTiles;
-
-  void addHabitAndTile(Habit habit) {
-    _habits.add(habit);
-    _habitTiles.add(HabitTile(habit));
-    notifyListeners();
-    // printHabits();
-  }
-
-  void deleteAllHabits() {
-    _habits.clear();
-    _habitTiles.clear();
-    notifyListeners();
-    // printHabits();
-  }
-
-  // для тестування
-  // void printHabits() {
-  //   print(" > PRINTING HABITS . . .  (length is ${_habits.length} OR ${_habitTiles.length})");
-  //   for (int i = 0; i < _habits.length; i++) {
-  //     print(" > ID: $i - ${_habits[i].name} - ${_habits[i].wasDone}");
-  //   }
-  // }
-}
 
 // DATE
 class DateNotifier extends ChangeNotifier {
-  DateTime _currentDate = DateTime.now();
-  DateTime get currentDate => _currentDate;
+  String _currentDate = Converter.datetimeToString(DateTime.now());
+  String get currentDate => _currentDate;
 
-  void resetCurrentDate () {
-    var now = DateTime.now();
+  void resetCurrentDate() {
+    String now = Converter.datetimeToString(DateTime.now());
     if (_currentDate != now) {
       _currentDate = now;
       notifyListeners();
     }
     // TODO: додати логіку зсуву habitSquare
   }
-}
 
-// TABS (4 pages in the PageView)
-// class TabNotifier extends ChangeNotifier {
-//   // 0 - Home, 1 - Courses, 2 - Community, 3 - Settings
-//   // int _currentTab = 0;
-//   // int get currentTab => _currentTab;
-//   // set currentTab (int tab) => _currentTab = tab;
-//
-//   final PageController _pageController = PageController();
-//   PageController get pageController => _pageController;
-// }
+  void nextDay() {
+    DateTime currentDate = Converter.stringToDatetime(_currentDate);
+    DateTime nextDay = currentDate.add(const Duration(days: 1));
+    _currentDate = Converter.datetimeToString(nextDay);
+    FirestoreService.nextDay();
+    notifyListeners();
+  }
+}
 
 // LIGHT & DARK THEM
 class ThemeNotifier extends ChangeNotifier {

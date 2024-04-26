@@ -1,12 +1,10 @@
 import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 import '../constants/c_routes.dart';
-import '../entities/habit.dart';
 import '../models.dart';
 import '../constants/c_colors.dart';
 import '../constants/c_strings.dart';
@@ -33,7 +31,7 @@ class MainScreen extends StatelessWidget {
 
     switch (settings.name) {
       case CRoutes.routeHomePage:
-        page = const HomePage();
+        page = HomePage();
       case CRoutes.routeCourses:
         page = const CoursesPage();
       case CRoutes.routeCommunity:
@@ -63,32 +61,25 @@ class MainScreen extends StatelessWidget {
             child: Consumer<ThemeNotifier>(
               builder: (context, theme, child) {
                 return Stack(
-                    children: [
-                      Image.asset(
-                        "lib/images/Homepage.png",
-                        fit: BoxFit.cover,
-                      ),
-                      Container(
-                        color: Colors.black.withOpacity(theme.isDarkTheme ? 0.5 : 0),
-                      )
-                    ]
+                  fit: StackFit.expand,
+                  children: [
+                    Image.asset(
+                      "lib/images/Homepage.png",
+                      fit: BoxFit.fitWidth,
+                    ),
+                    Container(
+                      color: Colors.black.withOpacity(theme.isDarkTheme ? 0.5 : 0),
+                    )
+                  ]
                 );
               },
             ),
           ),
 
-          GestureDetector(
-            // onHorizontalDragEnd: (DragEndDetails dragEndDetails) {
-            //   print(" s w i p e   right");
-            // },
-            // onHorizontalDragStart: (DragStartDetails dragStartDetails) {
-            //   print(" s w i p e   left");
-            // },
-            child: Navigator(
-              key: _navigatorKey,
-              initialRoute: CRoutes.routeHomePage,
-              onGenerateRoute: _onGenerateRoute,
-            ),
+          Navigator(
+            key: _navigatorKey,
+            initialRoute: CRoutes.routeHomePage,
+            onGenerateRoute: _onGenerateRoute,
           ),
 
           Column(
@@ -108,63 +99,6 @@ class MainScreen extends StatelessWidget {
             ],
           )
         ],
-      ),
-    );
-  }
-}
-
-class InspiringQuote extends StatelessWidget {
-  const InspiringQuote({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(30),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
-        child: Container(
-          color: Colors.white,
-          height: 130,
-          width: double.infinity,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    top: 20,
-                    bottom: 20,
-                    left: 15,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        CStrings.inspiringQuotes[
-                        Random().nextInt(CStrings.inspiringQuotes.length)],
-                        style: const TextStyle(
-                          color: CColors.purple,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      Text(
-                        CStrings.quoteAuthor,
-                        style: TextStyle(
-                            color: CColors.purple.withOpacity(0.5),
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              Image.asset("lib/images/Quote girl.png")
-            ],
-          ),
-        ),
       ),
     );
   }

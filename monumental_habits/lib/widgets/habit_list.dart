@@ -1,75 +1,76 @@
-import 'package:flutter/cupertino.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:monumental_habits/services/converter.dart';
 import 'package:provider/provider.dart';
 
 import '../models.dart';
 import '../constants/c_colors.dart';
 import '../entities/habit.dart';
 import '../screens/habit_info_screen.dart';
+import '../services/firestore_service.dart';
 
 const double squareSize = 50;
 
 class HabitList extends StatelessWidget {
   final Size size;
-  final List<HabitTile> habitTiles;
+  // final List<Habit> habits;
 
-  const HabitList(this.habitTiles, this.size, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: size.height * 3 / 5,
-      width: size.width,
-      child: ListView(
-        children: [
-          HabitListHeader(),
-          ...habitTiles,
-          const DeleteButton(),
-          SizedBox(
-            height: size.height / 5,
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class DeleteButton extends StatelessWidget {
-  const DeleteButton({super.key});
+  const HabitList(this.size, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<HabitNotifier>(
-      builder: (context, model, child) {
-        return model.habits.isEmpty
-            ? const SizedBox()
-            : Padding(
-                padding: const EdgeInsets.all(30),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Consumer<ThemeNotifier>(
-                    builder: (context, theme, child) {
-                      return Container(
-                        color: theme.primaryColor,
-                        width: 30,
-                        child: IconButton(
-                          onPressed: () {
-                            Future.delayed(const Duration(seconds: 1)).then((value) {
-                              model.deleteAllHabits();
-                            });
-                          },
-                          icon: Icon(
-                            Icons.delete_sweep_outlined,
-                            size: 30,
-                            color: theme.textColor,
-                          )),
+    return Align(
+      child: SizedBox(
+        width: size.width,
+        child: StreamBuilder<QuerySnapshot>(
+            stream: FirestoreService.getHabitsStream(),
+            builder: (context, snapshot) {
+
+              List habitList = snapshot.data?.docs ?? [];
+              if (!snapshot.hasData) return const SizedBox();
+
+              return ListView.builder(
+                  itemCount: habitList.length + 2,
+                  itemBuilder: (context, index) {
+                    // 0 - header, [1, length] - habit tiles, length+1 - sized box
+                    if (index == 0) {
+                      return HabitListHeader();
+                    }
+                    // if (index == habitList.length + 1) {
+                    //   return SizedBox(height: size.height / 5);
+                    // }
+                    if (index == habitList.length + 1) {
+                      return IconButton(
+                        onPressed: () {
+                          Provider.of<DateNotifier>(context, listen: false).nextDay();
+                        },
+                        icon: const Icon(Icons.date_range)
                       );
-                    },
-                  ),
-                ),
+                    }
+
+                    DocumentSnapshot document = habitList[index - 1];
+                    Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+
+                    // TODO: чомусь дає помилку "type 'List<dynamic>' is not a
+                    // subtype of type 'List<bool>' in type cast
+                    // List<bool> wasDONE = data['wasDone'] as List<bool>;
+
+                    Map<String, bool> oldWasDone = {...data['wasDone']};
+
+                    Map<DateTime, bool> newWasDone = FirestoreService
+                        .convertStringToDateTimeMap(oldWasDone);
+
+                    return HabitTile(Habit(
+                        name: data['name'],
+                        color: Color(data['color'] as int),
+                        wasDone: {...newWasDone},
+                        docID: document.id
+                    ));
+                  }
               );
-      },
+            }
+        ),
+      ),
     );
   }
 }
@@ -77,8 +78,10 @@ class DeleteButton extends StatelessWidget {
 class HabitListHeader extends StatelessWidget {
   HabitListHeader({super.key});
 
-  String getWeekdayName(DateTime today) {
-    switch (today.weekday) {
+  String getWeekdayName(String stringDate, int daysPassed) {
+    DateTime today = Converter.stringToDatetime(stringDate);
+    DateTime givenDay = today.subtract(Duration(days: daysPassed));
+    switch (givenDay.weekday) {
       case 1:
         return 'MON';
       case 2:
@@ -101,7 +104,11 @@ class HabitListHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 30, right: 30),
+      padding: const EdgeInsets.only(
+        top: 20,
+        left: 30,
+        right: 30
+      ),
       child: Row(
         children: [
           Expanded(
@@ -127,16 +134,15 @@ class HabitListHeader extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     DateSquare(
-                        day: getWeekdayName(
-                            date.currentDate.subtract(const Duration(days: 2))),
-                        date: date.currentDate.day - 2),
+                      day: getWeekdayName(date.currentDate, 2),
+                      date: Converter.stringToDatetime(date.currentDate).day - 2
+                    ),
                     DateSquare(
-                        day: getWeekdayName(
-                            date.currentDate.subtract(const Duration(days: 1))),
-                        date: date.currentDate.day - 1),
+                        day: getWeekdayName(date.currentDate, 1),
+                        date: Converter.stringToDatetime(date.currentDate).day - 1),
                     DateSquare(
-                        day: getWeekdayName(date.currentDate),
-                        date: date.currentDate.day),
+                        day: getWeekdayName(date.currentDate, 0),
+                        date: Converter.stringToDatetime(date.currentDate).day),
                   ],
                 );
               },
@@ -150,24 +156,9 @@ class HabitListHeader extends StatelessWidget {
 
 class HabitTile extends StatelessWidget {
   final Habit _habit;
-  late final List<HabitSquare> habitSquares;
+  late List<HabitSquare> habitSquares;
 
-  HabitTile(this._habit, {super.key}) {
-    habitSquares = [
-      HabitSquare(
-        id: 0,
-        habit: _habit,
-      ),
-      HabitSquare(
-        id: 1,
-        habit: _habit,
-      ),
-      HabitSquare(
-        id: 2,
-        habit: _habit,
-      ),
-    ];
-  }
+  HabitTile(this._habit, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -212,9 +203,26 @@ class HabitTile extends StatelessWidget {
                       ),
                       Expanded(
                         flex: 10,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: habitSquares,
+                        child: Consumer<DateNotifier>(
+                          builder: (context, date, child) {
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                HabitSquare(
+                                  id: 2,
+                                  habit: _habit,
+                                ),
+                                HabitSquare(
+                                  id: 1,
+                                  habit: _habit,
+                                ),
+                                HabitSquare(
+                                  id: 0,
+                                  habit: _habit,
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ),
                     ],
@@ -233,7 +241,7 @@ class HabitSquare extends StatefulWidget {
   final int id;
   final Habit habit;
 
-  const HabitSquare(
+  HabitSquare(
       {required this.id,
       required this.habit,
       super.key});
@@ -250,46 +258,56 @@ class _HabitSquareState extends State<HabitSquare> {
   void initState() {
     super.initState();
     backgroundColor = widget.habit.color.withOpacity(0.2);
-    foregroundColor =
-        (widget.habit.wasDone[widget.id]) ? widget.habit.color : backgroundColor;
+    foregroundColor = backgroundColor;
   }
 
   @override
   Widget build(BuildContext context) {
-    return widget.habit.wasDone.isEmpty
-        ? const SizedBox()
-        : InkWell(
-            onTap: () {
-              setState(() {
-                foregroundColor = widget.habit.color;
-                widget.habit.wasDone[widget.id] = true;
-              });
-            },
-            onDoubleTap: () {
-              setState(() {
-                foregroundColor = backgroundColor;
-                widget.habit.wasDone[widget.id] = false;
-              });
-            },
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Container(
-                color: backgroundColor,
-                height: squareSize,
-                width: squareSize,
-                alignment: Alignment.center,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
-                    color: foregroundColor,
-                    height: squareSize - 4,
-                    width: squareSize - 4,
-                    alignment: Alignment.center,
-                  ),
-                ),
-              ),
+
+    bool flag;
+    String today = Provider.of<DateNotifier>(context, listen: true).currentDate;
+    DateTime thisDay = Converter.stringToDatetime(today).subtract(Duration(days: widget.id));
+    String thisDayString = Converter.datetimeToString(thisDay);
+    thisDay = Converter.stringToDatetime(thisDayString);
+
+    if (flag = widget.habit.wasDone[thisDay] != null) {
+      foregroundColor = flag ? widget.habit.color : backgroundColor;
+    }
+
+    return InkWell(
+      onTap: () {
+        setState(() {
+          foregroundColor = widget.habit.color;
+          widget.habit.wasDone[thisDay] = true;
+          FirestoreService.updateHabit(widget.habit.docID, widget.habit);
+        });
+      },
+      onDoubleTap: () {
+        setState(() {
+          foregroundColor = backgroundColor;
+          widget.habit.wasDone[thisDay] = false;
+          FirestoreService.updateHabit(widget.habit.docID, widget.habit);
+        });
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          color: backgroundColor,
+          height: squareSize,
+          width: squareSize,
+          alignment: Alignment.center,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              color: foregroundColor,
+              height: squareSize - 4,
+              width: squareSize - 4,
+              alignment: Alignment.center,
             ),
-          );
+          ),
+        ),
+      ),
+    );
   }
 }
 

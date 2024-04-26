@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'entities/course.dart';
+import '../entities/course.dart';
 
 class CourseService {
   const CourseService();

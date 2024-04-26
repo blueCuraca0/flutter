@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:monumental_habits/models.dart';
 import 'package:provider/provider.dart';
 
-import '../course_service.dart';
+import '../services/course_service.dart';
 import '../entities/course.dart';
 import '../widgets/app_bar.dart';
 

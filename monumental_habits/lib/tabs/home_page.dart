@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:monumental_habits/widgets/app_bar.dart';
 import 'package:provider/provider.dart';
@@ -7,11 +8,11 @@ import 'package:provider/provider.dart';
 import '../models.dart';
 import '../constants/c_colors.dart';
 import '../constants/c_strings.dart';
+import '../services/firestore_service.dart';
 import '../widgets/habit_list.dart';
 
 class HomePage extends StatelessWidget {
-
-  const HomePage({super.key});
+  HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,13 +24,9 @@ class HomePage extends StatelessWidget {
         children: [
           Column(
             children: [
-              SizedBox(height: size.height / 4,),
+              const SizedBox(height: 230),
               Expanded(
-                child: Consumer<HabitNotifier>(
-                  builder: (context, model, child) {
-                    return HabitList(model.habitTiles, size);
-                  },
-                ),
+                child: HabitList(size),
               )
             ],
           ),
@@ -61,8 +58,8 @@ class InspiringQuote extends StatelessWidget {
         borderRadius: BorderRadius.circular(15),
         child: Container(
           color: Colors.white,
-          height: 130,
           width: double.infinity,
+          height: 130,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -74,7 +71,8 @@ class InspiringQuote extends StatelessWidget {
                     left: 15,
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
                         CStrings.inspiringQuotes[
@@ -84,21 +82,19 @@ class InspiringQuote extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(
-                        height: 5,
-                      ),
                       Text(
                         CStrings.quoteAuthor,
                         style: TextStyle(
                             color: CColors.purple.withOpacity(0.5),
                             fontWeight: FontWeight.w500,
-                            fontSize: 12),
+                            fontSize: 12
+                        ),
                       )
                     ],
                   ),
                 ),
               ),
-              Image.asset("lib/images/Quote girl.png")
+              Image.asset("lib/images/Quote girl.png",)
             ],
           ),
         ),
