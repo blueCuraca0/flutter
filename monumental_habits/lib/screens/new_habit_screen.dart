@@ -32,6 +32,7 @@ class _NewHabitScreenState extends State<NewHabitScreen> {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         body: Stack(
+          fit: StackFit.expand,
           children: [
             SizedBox(
               width: double.infinity,

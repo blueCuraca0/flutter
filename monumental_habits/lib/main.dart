@@ -37,20 +37,6 @@ class _MyAppState extends State<MyApp> {
         ? CRoutes.routeIntroductionPage
         : CRoutes.routeMainPage;
     UserSharedPreferences.setFirstTime(false);
-
-
-    // TODO: не знаю куди роботу з темою діти, якщо ми використовуємо іменовані роути
-
-    /*
-    * Error: Could not find the correct Provider<ThemeNotifier> above this
-    * MyApp Widget. This happens because you used a `BuildContext` that does not include the provider
-    * of your choice.
-    */
-
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   Provider.of<ThemeNotifier>(context, listen: false)
-    //       .setIsDarkTheme(UserSharedPreferences.getTheme());
-    // });
   }
 
   @override
@@ -66,7 +52,8 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => DateNotifier(),),
-        ChangeNotifierProvider(create: (context) => ThemeNotifier(),),
+        ChangeNotifierProvider(create: (context) => ThemeNotifier()
+          ..setIsDarkTheme(UserSharedPreferences.getTheme())),
       ],
       builder: (context, child) {
         return MaterialApp(

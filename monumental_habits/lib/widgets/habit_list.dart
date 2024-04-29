@@ -34,18 +34,10 @@ class HabitList extends StatelessWidget {
                   itemBuilder: (context, index) {
                     // 0 - header, [1, length] - habit tiles, length+1 - sized box
                     if (index == 0) {
-                      return HabitListHeader();
+                      return const HabitListHeader();
                     }
-                    // if (index == habitList.length + 1) {
-                    //   return SizedBox(height: size.height / 5);
-                    // }
                     if (index == habitList.length + 1) {
-                      return IconButton(
-                        onPressed: () {
-                          Provider.of<DateNotifier>(context, listen: false).nextDay();
-                        },
-                        icon: const Icon(Icons.date_range)
-                      );
+                      return SizedBox(height: size.height / 5);
                     }
 
                     DocumentSnapshot document = habitList[index - 1];
@@ -55,15 +47,10 @@ class HabitList extends StatelessWidget {
                     // subtype of type 'List<bool>' in type cast
                     // List<bool> wasDONE = data['wasDone'] as List<bool>;
 
-                    Map<String, bool> oldWasDone = {...data['wasDone']};
-
-                    Map<DateTime, bool> newWasDone = FirestoreService
-                        .convertStringToDateTimeMap(oldWasDone);
-
                     return HabitTile(Habit(
                         name: data['name'],
                         color: Color(data['color'] as int),
-                        wasDone: {...newWasDone},
+                        wasDone: {...data['wasDone']},
                         docID: document.id
                     ));
                   }
@@ -76,7 +63,7 @@ class HabitList extends StatelessWidget {
 }
 
 class HabitListHeader extends StatelessWidget {
-  HabitListHeader({super.key});
+  const HabitListHeader({super.key});
 
   String getWeekdayName(String stringDate, int daysPassed) {
     DateTime today = Converter.stringToDatetime(stringDate);
@@ -264,14 +251,15 @@ class _HabitSquareState extends State<HabitSquare> {
   @override
   Widget build(BuildContext context) {
 
-    bool flag;
     String today = Provider.of<DateNotifier>(context, listen: true).currentDate;
-    DateTime thisDay = Converter.stringToDatetime(today).subtract(Duration(days: widget.id));
-    String thisDayString = Converter.datetimeToString(thisDay);
-    thisDay = Converter.stringToDatetime(thisDayString);
+    String thisDay = Converter.subtractDaysStringToString(today, widget.id);
 
-    if (flag = widget.habit.wasDone[thisDay] != null) {
-      foregroundColor = flag ? widget.habit.color : backgroundColor;
+    foregroundColor = (widget.habit.wasDone[thisDay] ?? false)
+        ? widget.habit.color
+        : backgroundColor ;
+
+    if (widget.habit.wasDone[thisDay] == null) {
+      widget.habit.wasDone[thisDay] = false;
     }
 
     return InkWell(

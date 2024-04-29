@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:monumental_habits/services/converter.dart';
-import 'package:monumental_habits/services/firestore_service.dart';
 import 'package:monumental_habits/user_shared_preferences.dart';
 import 'constants/c_colors.dart';
 
@@ -15,15 +14,6 @@ class DateNotifier extends ChangeNotifier {
       _currentDate = now;
       notifyListeners();
     }
-    // TODO: додати логіку зсуву habitSquare
-  }
-
-  void nextDay() {
-    DateTime currentDate = Converter.stringToDatetime(_currentDate);
-    DateTime nextDay = currentDate.add(const Duration(days: 1));
-    _currentDate = Converter.datetimeToString(nextDay);
-    FirestoreService.nextDay();
-    notifyListeners();
   }
 }
 

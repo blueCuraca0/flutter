@@ -64,26 +64,26 @@ class BottomNavBar extends StatelessWidget {
                       children: [
                         IconButton(
                             onPressed: () {
-                              _navigator.currentState?.pushNamed(CRoutes.routeHomePage);
+                              _navigator.currentState?.pushReplacementNamed(CRoutes.routeHomePage);
                             },
                             icon: Icon(Icons.home, color: theme.secondaryColor.withOpacity(0.75))
                         ),
                         IconButton(
                             onPressed: () {
-                              _navigator.currentState?.pushNamed(CRoutes.routeCourses);
+                              _navigator.currentState?.pushReplacementNamed(CRoutes.routeCourses);
                             },
                             icon: Icon(Icons.article, color: theme.secondaryColor.withOpacity(0.75))
                         ),
                         const SizedBox(width: 40),
                         IconButton(
                             onPressed: () {
-                              _navigator.currentState?.pushNamed(CRoutes.routeCommunity);
+                              _navigator.currentState?.pushReplacementNamed(CRoutes.routeCommunity);
                             },
                             icon: Icon(Icons.group, color: theme.secondaryColor.withOpacity(0.75))
                         ),
                         IconButton(
                             onPressed: () {
-                              _navigator.currentState?.pushNamed(CRoutes.routeSettings);
+                              _navigator.currentState?.pushReplacementNamed(CRoutes.routeSettings);
                             },
                             icon: Icon(Icons.settings, color: theme.secondaryColor.withOpacity(0.75))
                         ),

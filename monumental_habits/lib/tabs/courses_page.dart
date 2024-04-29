@@ -33,6 +33,27 @@ class CoursesPage extends StatelessWidget {
       body: Stack(
         fit: StackFit.expand,
         children: [
+          SizedBox(
+            width: double.infinity,
+            height: double.infinity,
+            child: Consumer<ThemeNotifier>(
+              builder: (context, theme, child) {
+                return Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.asset(
+                        "lib/images/Homepage.png",
+                        fit: BoxFit.fitWidth,
+                      ),
+                      Container(
+                        color: Colors.black.withOpacity(theme.isDarkTheme ? 0.5 : 0),
+                      )
+                    ]
+                );
+              },
+            ),
+          ),
+
           Padding(
             padding: const EdgeInsets.all(30),
             child: Column(

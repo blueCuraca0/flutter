@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import '../constants/c_routes.dart';
 import '../models.dart';
 import '../constants/c_colors.dart';
-import '../constants/c_strings.dart';
 import '../widgets/bottom_nav_bar.dart';
 import '../tabs/home_page.dart';
 import '../tabs/community_page.dart';
@@ -39,13 +38,23 @@ class MainScreen extends StatelessWidget {
       case CRoutes.routeSettings:
         page = const SettingsPage();
       default:
-        print(" U N K N O W N   R O U T E");
         page = const Placeholder();
     }
 
-    return MaterialPageRoute<dynamic>(
-      builder: (context) => page,
-      settings: settings,
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => page,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(0.0, 1.0);
+        const end = Offset.zero;
+        const curve = Curves.ease;
+
+        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
     );
   }
 
@@ -53,52 +62,34 @@ class MainScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: [
-          SizedBox(
-            width: double.infinity,
-            height: double.infinity,
-            child: Consumer<ThemeNotifier>(
-              builder: (context, theme, child) {
-                return Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.asset(
-                      "lib/images/Homepage.png",
-                      fit: BoxFit.fitWidth,
-                    ),
-                    Container(
-                      color: Colors.black.withOpacity(theme.isDarkTheme ? 0.5 : 0),
-                    )
-                  ]
-                );
-              },
+      body: PopScope(
+        canPop: false,
+        child: Stack(
+          children: [
+            Navigator(
+              key: _navigatorKey,
+              initialRoute: CRoutes.routeHomePage,
+              onGenerateRoute: _onGenerateRoute,
             ),
-          ),
 
-          Navigator(
-            key: _navigatorKey,
-            initialRoute: CRoutes.routeHomePage,
-            onGenerateRoute: _onGenerateRoute,
-          ),
-
-          Column(
-            children: [
-              const Expanded(child: SizedBox()),
-              BottomNavBar(
-                _navigatorKey,
-                () {
-                  Navigator.pushNamed(context, CRoutes.routeNewHabit);
-                },
-                const Icon(
-                  Icons.add_rounded,
-                  size: 35,
-                  color: CColors.purple,
+            Column(
+              children: [
+                const Expanded(child: SizedBox()),
+                BottomNavBar(
+                  _navigatorKey,
+                  () {
+                    Navigator.pushNamed(context, CRoutes.routeNewHabit);
+                  },
+                  const Icon(
+                    Icons.add_rounded,
+                    size: 35,
+                    color: CColors.purple,
+                  )
                 )
-              )
-            ],
-          )
-        ],
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
